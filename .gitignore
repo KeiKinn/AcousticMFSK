@@ -1,0 +1,12 @@
+
+*.ccxml
+*.d
+*.obj
+*.opt
+*.prefs
+*.map
+*.ccsproject
+*.cproject
+*.launch
+*.project
+*.xml
