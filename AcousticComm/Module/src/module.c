@@ -129,8 +129,8 @@ void xCorr(const float *ptrSigy, const float *ptrFFTx, float *ptrCorr)
 
 void cmplx2real(float *real, float *cmplx)
 {
-	/*
-	 * 将复数fft转换为实数fft，方便画图确定是否运算正确。
+	/* 复数转实数操作
+	 * 比如将复数fft转换为实数fft，方便画图确定是否运算正确。
 	 */
 	int i;
 	for(i = 0; i < FFT_NUM; i++)
