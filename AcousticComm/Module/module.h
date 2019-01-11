@@ -16,7 +16,7 @@
 #define SAMPLE_RATE  100000
 #define LFM_LENGTH   1500
 #define TEST_LENGTH  4096
-#define PI           3.1415
+#define PI           3.1415926
 #define FFT_NUM      4096
 #define cFFT_NUM     2 * FFT_NUM
 
