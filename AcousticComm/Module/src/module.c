@@ -38,24 +38,6 @@ void calcuTwiddle(float *w, int n)
     {
             for(i = 0; i <n>>2;i += j)
             {
-//                    theta1 = 2 * PI * i / n;
-//                    x_t = cos(theta1);
-//                    y_t = sin(theta1);
-//                    w[k] = (float)x_t;
-//                    w[k + 1] = (float)y_t;
-//
-//                    theta2 = 4 * PI * i/n;
-//                    x_t = cos(theta2);
-//                    y_t = sin(theta2);
-//                    w[k + 2] = (float)x_t;
-//                    w[k + 3] = (float)y_t;
-//
-//                    theta3 = 6 * PI * i / n;
-//                    x_t = cos(theta3);
-//                    y_t = sin(theta3);
-//                    w[k + 4] = (float)x_t;
-//                    w[k + 5] = (float)y_t;
-//                    k += 6;
                     theta1 = 2 * PI * i / n;
                     w[k]     = (float)cos(theta1);
                     w[k + 1] = (float)sin(theta1);
@@ -68,7 +50,6 @@ void calcuTwiddle(float *w, int n)
                     w[k + 4] = (float)cos(theta3);
                     w[k + 5] = (float)sin(theta3);
                     k += 6;
-
             }
     }
 
@@ -114,16 +95,6 @@ void xCorr(const float *ptrSigy, const float *ptrFFTx, float *ptrCorr)
 	DSPF_sp_ifftSPxSP(FFT_NUM, xcorr_temp, TwiddleCoff, ptrCorr,  Brev, 4, 0, FFT_NUM);
 
 	/// --- xcorr前半段与后半段交换 ---//
-/*
- * for(counter = 0; counter < FFT_NUM; counter++)
-	{
-		float temp;
-		temp = ptrCorr[counter];
-		ptrCorr[counter] = ptrCorr[counter + FFT_NUM];
-		ptrCorr[counter + FFT_NUM] = temp;
-	}
-	*/
-
 	RightShift(ptrCorr, cFFT_NUM, FFT_NUM);
 }
 
@@ -140,17 +111,18 @@ void cmplx2real(float *real, float *cmplx)
 
 }
 
-
 void maxValue(maxStruct *ptrMax, const float *ptrData, int ArraySize)
 {
+    /* 最大值找寻
+     * 函数接收3个参数：
+     *      ptrMax 为 maxStruct 结构体指针
+     *      ptrData 为目标数组指针
+     *      ArraySize 为目标数组大小
+     * 函数找寻ptrData中的最大值，并将最大值Value及Location存入ptrMax中
+     */
     int counter = 0;
     ptrMax->Val = -1;
     ptrMax->Loc = -1;
-//    while(counter < ArraySize)
-//    {
-//        DataTemp[counter] = * (ptrData + counter);
-//        counter++;
-//    }
 
     for (counter = 0; counter < ArraySize; counter ++)
     {
@@ -160,7 +132,29 @@ void maxValue(maxStruct *ptrMax, const float *ptrData, int ArraySize)
             ptrMax->Loc = counter;
         }
     }
+}
 
+int isPeak(float ptrMaxVal, float *ptrData, int ArraySize)
+{
+    int bigger_counter = 0;
+    int counter = 0;
+    ptrMaxVal = ptrMaxVal / 3;
+    for(counter; counter < ArraySize; counter++)
+    {
+        if(ptrMaxVal < ptrData[counter])
+        {
+            bigger_counter++;
+        }
+    }
+
+    if(bigger_counter < 20 && bigger_counter > 3)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 void genTestLFM(float *ptrTest, int offset)
