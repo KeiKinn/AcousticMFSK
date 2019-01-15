@@ -94,7 +94,7 @@ int main(void)
             free(sploc);
         }
     }
-
+    SW_BREAKPOINT;
     return 0;
 }
 
