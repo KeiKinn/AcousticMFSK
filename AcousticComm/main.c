@@ -41,20 +41,19 @@ int main(void)
     maxStruct maxval;
 
     initProcessData();
-    //genTestLFM(signal_rec, 200);
+//    genTestLFM(signal_rec, 200);
     genLFM(lfm_local);
     memcpy((char *)&lfm_local_temp, (char *)&lfm_local, sizeof(lfm_local));
     DSPF_sp_fftSPxSP(FFT_NUM, lfm_local_temp,  TwiddleCoff, fft_lfm_local, Brev, 4, 0, FFT_NUM);
     readADC(ADC_DataBuffer, DataBuffer, fp, FFT_NUM);
 
-    int counter = 0;
+    int counter = 0, c_num;
     int data_size = DATA_LEN * sizeof(float);
+    c_num = (cFFT_NUM - DATA_LEN)/ SLIDER_LEN;
     for(counter; counter < 2; counter++)
     {
         int slider_counter = 0, sp = 0, invalid_counter = 0;
-        int c_num, flag;
-
-        c_num = (cFFT_NUM - DATA_LEN)/ SLIDER_LEN;
+        int flag;
         int *sploc;
         sploc = malloc(c_num * sizeof(int));
         if(sploc == NULL)
@@ -68,6 +67,7 @@ int main(void)
             flag = 0;
             sp = slider_counter * SLIDER_LEN;
             memcpy((char *)&signal_rec, (char *)&DataBuffer[sp], data_size);
+
             xCorr(signal_rec, fft_lfm_local, xcorr);
             maxValue(&maxval, xcorr, cFFT_NUM);
             flag = isPeak(maxval.Val, xcorr, cFFT_NUM);
@@ -84,15 +84,24 @@ int main(void)
 
         if(invalid_counter > 2)
         {
+            lfm_sp = cFFT_NUM + 1;
             readADC(ADC_DataBuffer, DataBuffer, fp, FFT_NUM);
             free(sploc);
         }
         else
         {
-//            LFMsp(sploc);
-            lfm_sp = 10000;
+//            LFMsp(sploc, invalid_counter, c_num);
+            lfm_sp = sploc[counter];
             free(sploc);
         }
+
+        // FSK ½âµ÷
+        if(lfm_sp != (cFFT_NUM + 1))
+        {
+            //fsk demod
+            SW_BREAKPOINT;
+        }
+        SW_BREAKPOINT;
     }
     SW_BREAKPOINT;
     return 0;

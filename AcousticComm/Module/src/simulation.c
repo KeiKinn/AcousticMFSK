@@ -23,3 +23,9 @@ void readADC(float *ptrDataBuffer, float *ptrData, FILE *fp, int ArraySize)
     memcpy((char *)&ptrData[0], (char *)&ptrData[ArraySize], ArraySize * sizeof(float));
     memcpy((char *)&ptrData[ArraySize], (char *)&ptrDataBuffer[0], ArraySize * sizeof(float));
 }
+
+void genTestLFM(float *ptrTest, int offset)
+{
+    genLFM(ptrTest);
+    RightShift(ptrTest, cFFT_NUM, offset);
+}

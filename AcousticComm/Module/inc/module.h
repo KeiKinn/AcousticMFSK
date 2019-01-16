@@ -34,8 +34,9 @@ void cmplx2real(float *real, float *cmplx);
 void xCorr(const float *ptrSigy,const float *ptrSigx, float *ptrCorr);
 void maxValue(maxStruct *ptrMax, const float *ptrData, int ArraySize);
 int isPeak(float ptrMaxVal, float *ptrData, int ArraySize);
+int LFMsp(int *ptrLoc, const int ptrFlag, const int ArraySize);
 
-void genTestLFM(float *ptrTest, int offset);
+//void genTestLFM(float *ptrTest, int offset);
 void Reverse(float *arr, int b, int e);
 void RightShift(float *arr, int N, int K);
 

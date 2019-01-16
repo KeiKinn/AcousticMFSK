@@ -157,27 +157,36 @@ int isPeak(float ptrMaxVal, float *ptrData, int ArraySize)
     }
 }
 
-void genTestLFM(float *ptrTest, int offset)
+int LFMsp(int *ptrLoc, const int ptrFlag, const int ArraySize)
 {
-	genLFM(ptrTest);
-	RightShift(ptrTest, cFFT_NUM, offset);
-}
+/*
+ * 函数用于返回LFM信号的起始位置
+ * 函数假设信号一定是滑入待处理信号段的
+ * 对于待处理段起始部分包含了部分信号的情况并未纳入考虑
+ */
+    int counter = ptrFlag;
+    for(counter; counter < ArraySize; counter++)
+    {
+        ;
+    }
 
+    return 1;
+}
 
 void RightShift(float *arr, int N, int K)
 {
-	K = K % N ;
-	Reverse(arr, 0, N-K-1);     //前面N-K部分逆序
-	Reverse(arr, N-K, N-1);     //后面K部分逆序
-	Reverse(arr, 0, N-1);       //全部逆序
+    K = K % N ;
+    Reverse(arr, 0, N-K-1);     //前面N-K部分逆序
+    Reverse(arr, N-K, N-1);     //后面K部分逆序
+    Reverse(arr, 0, N-1);       //全部逆序
 }
 
 void Reverse(float *arr, int b, int e)      //逆序排列
 {
-	for( ; b < e; b++, e--)    //从数组的前、后一起遍历
-	{
-		float temp = arr[e];
-		arr[e] = arr[b];
-		arr[b] = temp;
-	}
+    for( ; b < e; b++, e--)    //从数组的前、后一起遍历
+    {
+        float temp = arr[e];
+        arr[e] = arr[b];
+        arr[b] = temp;
+    }
 }
