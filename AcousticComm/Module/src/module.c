@@ -136,6 +136,15 @@ void maxValue(maxStruct *ptrMax, const float *ptrData, int ArraySize)
 
 int isPeak(float ptrMaxVal, float *ptrData, int ArraySize)
 {
+    /*
+     * 峰值判定
+     * 峰值判定的依据是：
+     * 整个数据段中超过最大值1/3的数据低于一定的门限时，
+     * 判定该最大值为峰值
+     *
+     * 峰值判定的算法仍需要极大的改进，要么添加更多的判别方法互相佐证，
+     * 要么采用更加数学的办法
+     */
     int bigger_counter = 0;
     int counter = 0;
     ptrMaxVal = ptrMaxVal / 3;
@@ -163,6 +172,8 @@ int LFMsp(int *ptrLoc, const int ptrFlag, const int ArraySize)
  * 函数用于返回LFM信号的起始位置
  * 函数假设信号一定是滑入待处理信号段的
  * 对于待处理段起始部分包含了部分信号的情况并未纳入考虑
+ * 限制条件：
+ * 1. 信号的起始位置一定为偶数，因为奇数位是信号的虚部
  */
     int counter = ptrFlag;
     for(counter; counter < ArraySize; counter++)

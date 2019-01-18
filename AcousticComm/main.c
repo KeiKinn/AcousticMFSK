@@ -6,6 +6,7 @@
 #include "dsplib.h"                 // DSP 函数库
 #include "module.h"
 #include "simulation.h"
+#include "mfsk.h"
 
 FILE *fp = NULL;
 #define SW_BREAKPOINT     asm(" SWBP 0 ");
@@ -28,10 +29,11 @@ unsigned char Brev[64] = {
 
 float lfm_local[cFFT_NUM]; // 复数信号，虚部为0
 float TwiddleCoff[cFFT_NUM]; // FFT 运算的旋转因子
-float ADC_DataBuffer[FFT_NUM];  // ADC数据缓冲
-float DataBuffer[cFFT_NUM];
+//float ADC_DataBuffer[FFT_NUM];  // ADC数据缓冲
+float DataBuffer[cFFT_NUM]; // 滑动窗数据
 float signal_rec[cFFT_NUM]; // 接收信号
 int   lfm_sp;
+NCDW  baseband[Quad];
 
 int main(void)
 {
@@ -41,16 +43,17 @@ int main(void)
     maxStruct maxval;
 
     initProcessData();
+//    initDemodFsk();
 //    genTestLFM(signal_rec, 200);
     genLFM(lfm_local);
     memcpy((char *)&lfm_local_temp, (char *)&lfm_local, sizeof(lfm_local));
     DSPF_sp_fftSPxSP(FFT_NUM, lfm_local_temp,  TwiddleCoff, fft_lfm_local, Brev, 4, 0, FFT_NUM);
-    readADC(ADC_DataBuffer, DataBuffer, fp, FFT_NUM);
+    readADC(DataBuffer, fp, FFT_NUM);
 
-    int counter = 0, c_num;
+    int counter, c_num;
     int data_size = DATA_LEN * sizeof(float);
     c_num = (cFFT_NUM - DATA_LEN)/ SLIDER_LEN;
-    for(counter; counter < 2; counter++)
+    for(counter = 0; counter < 2; counter++)
     {
         int slider_counter = 0, sp = 0, invalid_counter = 0;
         int flag;
@@ -85,7 +88,7 @@ int main(void)
         if(invalid_counter > 2)
         {
             lfm_sp = cFFT_NUM + 1;
-            readADC(ADC_DataBuffer, DataBuffer, fp, FFT_NUM);
+            readADC(DataBuffer, fp, FFT_NUM);
             free(sploc);
         }
         else
@@ -96,16 +99,30 @@ int main(void)
         }
 
         // FSK 解调
-        if(lfm_sp != (cFFT_NUM + 1))
-        {
-            //fsk demod
-            SW_BREAKPOINT;
-        }
+//        if(lfm_sp != (cFFT_NUM + 1))
+//        {
+//            //fsk demod
+//            int fsk_sp;
+//            readADC(DataBuffer, fp, FFT_NUM);
+//            fsk_sp = lfm_sp + 2 * (LFM_LENGTH + INTERVAL) - FFT_NUM;
+//
+//            float fsk_data[2 * SAMPLE_PER_SYMBLE];
+//            float decisionvector[Quad];
+//            while((fsk_sp + 2 * SAMPLE_PER_SYMBLE) < cFFT_NUM)
+//            {
+//                int datasize;
+//                datasize = 2 * SAMPLE_PER_SYMBLE * sizeof(float);
+//                memcpy((char *)fsk_data,   (char *)DataBuffer, bytenums);
+//            }
+//
+//            SW_BREAKPOINT;
+//        }
         SW_BREAKPOINT;
     }
     SW_BREAKPOINT;
     return 0;
 }
+
 
 void initProcessData(void)
 {
@@ -119,4 +136,12 @@ void initProcessData(void)
         printf("No Such File\n");
     }
     calcuTwiddle(TwiddleCoff, FFT_NUM);
+}
+
+void initDemodFsk(void)
+{
+    genNonCoherentDemodWave(BASE_BAND_FREQ0, SAMPLE_PER_SYMBLE, &baseband[0]);
+    genNonCoherentDemodWave(BASE_BAND_FREQ1, SAMPLE_PER_SYMBLE, &baseband[1]);
+    genNonCoherentDemodWave(BASE_BAND_FREQ2, SAMPLE_PER_SYMBLE, &baseband[2]);
+    genNonCoherentDemodWave(BASE_BAND_FREQ3, SAMPLE_PER_SYMBLE, &baseband[3]);
 }

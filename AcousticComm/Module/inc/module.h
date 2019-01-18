@@ -20,6 +20,7 @@
 #define cFFT_NUM     (2 * FFT_NUM)
 #define SLIDER_LEN   (2 * 512)
 #define DATA_LEN     (2 * 2048)
+#define INTERVAL     1500
 
 typedef struct
 {
@@ -35,8 +36,6 @@ void xCorr(const float *ptrSigy,const float *ptrSigx, float *ptrCorr);
 void maxValue(maxStruct *ptrMax, const float *ptrData, int ArraySize);
 int isPeak(float ptrMaxVal, float *ptrData, int ArraySize);
 int LFMsp(int *ptrLoc, const int ptrFlag, const int ArraySize);
-
-//void genTestLFM(float *ptrTest, int offset);
 void Reverse(float *arr, int b, int e);
 void RightShift(float *arr, int N, int K);
 
