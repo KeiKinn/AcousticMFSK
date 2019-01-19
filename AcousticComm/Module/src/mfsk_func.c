@@ -1,6 +1,6 @@
 #include <math.h>
+#include "lfm.h"
 #include "mfsk.h"
-#include "module.h"
 
 void Normalize(float *ptrData, int len)
 {

@@ -1,7 +1,17 @@
+/*
+ * common.h
+ *
+ *  Created on: 2019年1月19日
+ *      Author: JingX
+ *
+ *  该头文件主要存放FSK信号解调相关的定义
+ *  与函数定义
+ */
 #ifndef mfsk_H_
 #define mfsk_H_
 
 #include <stdio.h>
+#include "common.h"
 
 #define SAMPLE_PER_SYMBLE 255
 #define Quad              4
@@ -13,12 +23,6 @@
 #define BASE_BAND_FREQ3   26000
 
 #define GET_ARRAY_LEN(array,len){len = (sizeof(array) / sizeof(array[0]));}
-
-typedef struct
-{
-   float deSin[2 * SAMPLE_PER_SYMBLE];
-   float deCos[2 * SAMPLE_PER_SYMBLE];
-}NCDW;
 
 void Normalize(float *ptrData, int len);
 void genNonCoherentDemodWave(int freq, int timelen, NCDW *ptrData);

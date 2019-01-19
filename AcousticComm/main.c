@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include "mathlib.h"                // DSP 数学函数库
 #include "dsplib.h"                 // DSP 函数库
-#include "module.h"
+#include "common.h"
+#include "lfm.h"
 #include "simulation.h"
 #include "mfsk.h"
 
@@ -29,7 +30,6 @@ unsigned char Brev[64] = {
 
 float lfm_local[cFFT_NUM]; // 复数信号，虚部为0
 float TwiddleCoff[cFFT_NUM]; // FFT 运算的旋转因子
-//float ADC_DataBuffer[FFT_NUM];  // ADC数据缓冲
 float DataBuffer[cFFT_NUM]; // 滑动窗数据
 float signal_rec[cFFT_NUM]; // 接收信号
 int   lfm_sp;

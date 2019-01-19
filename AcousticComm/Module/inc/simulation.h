@@ -5,14 +5,14 @@
  *      Author: JingX
  */
 
-#ifndef MODULE_INC_SIMULATION_H_
-#define MODULE_INC_SIMULATION_H_
+#ifndef SIMULATION_H_
+#define SIMULATION_H_
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "module.h"
+#include "lfm.h"
 
 void readADC(float *ptrData, FILE *fp, int ArraySize);
 void genTestLFM(float *ptrTest, int offset);
 
-#endif /* MODULE_INC_SIMULATION_H_ */
+#endif /* SIMULATION_H_ */
