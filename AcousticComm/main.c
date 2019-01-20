@@ -50,8 +50,10 @@ int main(void)
     readADC(DataBuffer, fp, FFT_NUM);
 
     int counter, c_num;
-    int data_size = DATA_LEN * sizeof(float);
+    int data_size = DATA_LEN * sizeof(float); // 滑动窗长度
+    int fsk_datasize = 2 * SAMPLE_PER_SYMBLE * sizeof(float); // fsk一个码元的数据长度
     c_num = (cFFT_NUM - DATA_LEN)/ SLIDER_LEN;
+
     for(counter = 0; counter < 2; counter++)
     {
         int slider_counter = 0, sp = 0, invalid_counter = 0;
@@ -107,11 +109,11 @@ int main(void)
             float fsk_data[2 * SAMPLE_PER_SYMBLE];
             float decisionvector[QUAD];
             maxStruct output;
-            int datasize, data_in_bin[2 * SYMBOL_NUM];
-            datasize = 2 * SAMPLE_PER_SYMBLE * sizeof(float);
+            int data_in_bin[2 * SYMBOL_NUM];
+
             while(counter < SECTION_NUM)
             {
-                memcpy((char *)&fsk_data,   (char *)&DataBuffer[fsk_sp], datasize);
+                memcpy((char *)&fsk_data,   (char *)&DataBuffer[fsk_sp], fsk_datasize);
                 int i = 0;
                 for(i; i < QUAD; i++)
                 {
@@ -140,12 +142,12 @@ int main(void)
                     break;
                 }
 
-                if((fsk_sp + 2 * SAMPLE_PER_SYMBLE) > cFFT_NUM) // 判断下一帧信号是否完整
+                fsk_sp = fsk_sp + 2 * SAMPLE_PER_SYMBLE;  // 更新fsk_sp，移向下一帧
+                if((fsk_sp + 2 * SAMPLE_PER_SYMBLE) > cFFT_NUM) // 判断是否为可以完整读取一帧数据
                 {
                     readADC(DataBuffer, fp, FFT_NUM);
                     fsk_sp = fsk_sp - FFT_NUM;
                 }
-
                 counter++;
             }
 

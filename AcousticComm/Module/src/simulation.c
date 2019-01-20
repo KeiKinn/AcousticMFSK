@@ -10,9 +10,9 @@ void readADC(float *ptrData, FILE *fp, int ArraySize)
 {
     /* 读取数据
      * 滑动式读取以保证数据不会中断
-     * ArraySize = N
-     * ptrData是应用于程序处理的数据，长度为2N
-     * ptrDataBuffer 是从数据中读取到的数据，长度为N
+     *      ArraySize = N
+     *      ptrData是应用于程序处理的数据，长度为2N
+     *      ptrDataBuffer 是从数据中读取到的数据，长度为N
      *
      * 核心原理：
      * 首先从数据流中读取长度为N的数据置入ptrDataBuffer
