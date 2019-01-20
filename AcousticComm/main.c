@@ -10,7 +10,6 @@
 #include "mfsk.h"
 
 FILE *fp = NULL;
-#define SW_BREAKPOINT     asm(" SWBP 0 ");
 #define FILEPATH  "E:\\CCSGit\\Data\\LFMTest.bin"
 
 #pragma DATA_ALIGN (Brev, 16)
@@ -33,7 +32,7 @@ float TwiddleCoff[cFFT_NUM]; // FFT 运算的旋转因子
 float DataBuffer[cFFT_NUM]; // 滑动窗数据
 float signal_rec[cFFT_NUM]; // 接收信号
 int   lfm_sp;
-NCDW  baseband[Quad];
+NCDW  baseband[QUAD];
 
 int main(void)
 {
@@ -43,8 +42,8 @@ int main(void)
     maxStruct maxval;
 
     initProcessData();
-//    initDemodFsk();
-//    genTestLFM(signal_rec, 200);
+    //    initDemodFsk();
+    //    genTestLFM(signal_rec, 200);
     genLFM(lfm_local);
     memcpy((char *)&lfm_local_temp, (char *)&lfm_local, sizeof(lfm_local));
     DSPF_sp_fftSPxSP(FFT_NUM, lfm_local_temp,  TwiddleCoff, fft_lfm_local, Brev, 4, 0, FFT_NUM);
@@ -93,30 +92,68 @@ int main(void)
         }
         else
         {
-//            LFMsp(sploc, invalid_counter, c_num);
+            //            LFMsp(sploc, invalid_counter, c_num);
             lfm_sp = sploc[counter];
             free(sploc);
         }
 
         // FSK 解调
-//        if(lfm_sp != (cFFT_NUM + 1))
-//        {
-//            //fsk demod
-//            int fsk_sp;
-//            readADC(DataBuffer, fp, FFT_NUM);
-//            fsk_sp = lfm_sp + 2 * (LFM_LENGTH + INTERVAL) - FFT_NUM;
-//
-//            float fsk_data[2 * SAMPLE_PER_SYMBLE];
-//            float decisionvector[Quad];
-//            while((fsk_sp + 2 * SAMPLE_PER_SYMBLE) < cFFT_NUM)
-//            {
-//                int datasize;
-//                datasize = 2 * SAMPLE_PER_SYMBLE * sizeof(float);
-//                memcpy((char *)fsk_data,   (char *)DataBuffer, bytenums);
-//            }
-//
-//            SW_BREAKPOINT;
-//        }
+        if(lfm_sp != (cFFT_NUM + 1))
+        {
+            int fsk_sp, counter = 0;
+            readADC(DataBuffer, fp, FFT_NUM);
+            fsk_sp = lfm_sp + 2 * (LFM_LENGTH + INTERVAL) - FFT_NUM;
+
+            float fsk_data[2 * SAMPLE_PER_SYMBLE];
+            float decisionvector[QUAD];
+            maxStruct output;
+            int datasize, data_in_bin[2 * SYMBOL_NUM];
+            datasize = 2 * SAMPLE_PER_SYMBLE * sizeof(float);
+            while(counter < SECTION_NUM)
+            {
+                memcpy((char *)&fsk_data,   (char *)&DataBuffer[fsk_sp], datasize);
+                int i = 0;
+                for(i; i < QUAD; i++)
+                {
+                    decisionvector[i] = SquareLawDetection(fsk_data, &baseband[i], 2 * SAMPLE_PER_SYMBLE);
+                }
+
+                maxValue(&output, decisionvector, QUAD);
+
+                switch(output.Loc)
+                {
+                case 0:
+                    data_in_bin[2 * (SECTION_NUM - 1 - counter)]      = 0;
+                    data_in_bin[2 * (SECTION_NUM - 1 - counter) + 1 ] = 0;
+                    break;
+                case 1:
+                    data_in_bin[2 * (SECTION_NUM - 1 - counter)]      = 0;
+                    data_in_bin[2 * (SECTION_NUM - 1 - counter) + 1 ] = 1;
+                    break;
+                case 2:
+                    data_in_bin[2 * (SECTION_NUM - 1 - counter)]      = 1;
+                    data_in_bin[2 * (SECTION_NUM - 1 - counter) + 1 ] = 0;
+                    break;
+                case 3:
+                    data_in_bin[2 * (SECTION_NUM - 1 - counter)]      = 1;
+                    data_in_bin[2 * (SECTION_NUM - 1 - counter) + 1 ] = 1;
+                    break;
+                }
+
+                if((fsk_sp + 2 * SAMPLE_PER_SYMBLE) > cFFT_NUM) // 判断下一帧信号是否完整
+                {
+                    readADC(DataBuffer, fp, FFT_NUM);
+                    fsk_sp = fsk_sp - FFT_NUM;
+                }
+
+                counter++;
+            }
+
+            char data_in_hex[SYMBOL_NUM];
+            bin2hex(data_in_hex, data_in_bin, BIT_NUM);
+            showData(data_in_hex, SYMBOL_NUM);
+            SW_BREAKPOINT;
+        }
         SW_BREAKPOINT;
     }
     SW_BREAKPOINT;
@@ -140,8 +177,8 @@ void initProcessData(void)
 
 void initDemodFsk(void)
 {
-    genNonCoherentDemodWave(BASE_BAND_FREQ0, SAMPLE_PER_SYMBLE, &baseband[0]);
-    genNonCoherentDemodWave(BASE_BAND_FREQ1, SAMPLE_PER_SYMBLE, &baseband[1]);
-    genNonCoherentDemodWave(BASE_BAND_FREQ2, SAMPLE_PER_SYMBLE, &baseband[2]);
-    genNonCoherentDemodWave(BASE_BAND_FREQ3, SAMPLE_PER_SYMBLE, &baseband[3]);
+    genNonCoherentDemodWave(&baseband[0], BASE_BAND_FREQ0, SAMPLE_PER_SYMBLE, SAMPLE_RATE);
+    genNonCoherentDemodWave(&baseband[1], BASE_BAND_FREQ1, SAMPLE_PER_SYMBLE, SAMPLE_RATE);
+    genNonCoherentDemodWave(&baseband[2], BASE_BAND_FREQ2, SAMPLE_PER_SYMBLE, SAMPLE_RATE);
+    genNonCoherentDemodWave(&baseband[3], BASE_BAND_FREQ3, SAMPLE_PER_SYMBLE, SAMPLE_RATE);
 }

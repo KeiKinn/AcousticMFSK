@@ -4,8 +4,8 @@
  *  Created on: 2019-1-7
  *      Author: JingX
  */
-#include <lfm.h>
-#define SW_BREAKPOINT     asm(" SWBP 0 ");
+#include "lfm.h"
+#include "common.h"
 
 extern float TwiddleCoff[cFFT_NUM];
 extern unsigned char Brev[64];
@@ -74,7 +74,7 @@ void xCorr(const float *ptrSigy, const float *ptrFFTx, float *ptrCorr)
 	}
 	DSPF_sp_fftSPxSP(FFT_NUM, sigy_temp, TwiddleCoff, fft_sigy, Brev, 4, 0, FFT_NUM);
 //	float real_fft_sigy[FFT_NUM];
-//	cmplx2real(real_fft_sigy, fft_sigy);
+//	cmplx2real(real_fft_sigy, fft_sigy, FFT_NUM);
 	for(counter = 0; counter < FFT_NUM; counter++)
 	{
 		/* FFT之后，求FFT_x的共轭与FFT_y的乘积
@@ -91,20 +91,24 @@ void xCorr(const float *ptrSigy, const float *ptrFFTx, float *ptrCorr)
 		xcorr_temp[2 * counter + 1] = a*d - b*c;
 	}
 //	float real_fft_sigy[FFT_NUM];
-//	cmplx2real(real_fft_sigy, xcorr_temp);
+//	cmplx2real(real_fft_sigy, xcorr_temp, FFT_NUM);
 	DSPF_sp_ifftSPxSP(FFT_NUM, xcorr_temp, TwiddleCoff, ptrCorr,  Brev, 4, 0, FFT_NUM);
 
 	/// --- xcorr前半段与后半段交换 ---//
 	RightShift(ptrCorr, cFFT_NUM, FFT_NUM);
 }
 
-void cmplx2real(float *real, float *cmplx)
+void cmplx2real(float *real, float *cmplx, int ArraySize)
 {
 	/* 复数转实数操作
 	 * 比如将复数fft转换为实数fft，方便画图确定是否运算正确。
+	 * 函数接收3个参数
+	 *      数组指针real：目标地址
+	 *      数组指针cmplx： 复数数组地址
+	 *      整形ArraySize：real指向的数组长度，通常为cmplx指向的数组长度的一半
 	 */
 	int i;
-	for(i = 0; i < FFT_NUM; i++)
+	for(i = 0; i < ArraySize; i++)
 	{
 		real[i] = cmplx[2 * i] * cmplx[2 * i] + cmplx[2 * i + 1] * cmplx[2 * i + 1];
 	}
@@ -156,7 +160,7 @@ int isPeak(float ptrMaxVal, float *ptrData, int ArraySize)
         }
     }
 
-    if(bigger_counter < 20 && bigger_counter > 3)
+    if(bigger_counter < 20 && bigger_counter > 3) //大于3的设定是为了防止数组中均为0或某一个数持续出现的情况
     {
         return 1;
     }
@@ -186,6 +190,13 @@ int LFMsp(int *ptrLoc, const int ptrFlag, const int ArraySize)
 
 void RightShift(float *arr, int N, int K)
 {
+    /*
+     * 数组右移函数
+     * 函数接收三个参数
+     *      数组指针arr： 待右移的数组
+     *      整形N：数组长度
+     *      整形K：右移的长度
+     */
     K = K % N ;
     Reverse(arr, 0, N-K-1);     //前面N-K部分逆序
     Reverse(arr, N-K, N-1);     //后面K部分逆序

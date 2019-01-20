@@ -14,13 +14,12 @@
 
 #define LFM_FRES     10000
 #define LFM_FREE     20000
-#define SAMPLE_RATE  100000
 #define LFM_LENGTH   2000
 
 void initProcessData(void);
 void calcuTwiddle(float *w, int n);
 void genLFM(float *ptrDesArray);
-void cmplx2real(float *real, float *cmplx);
+void cmplx2real(float *real, float *cmplx, int ArraySize);
 void xCorr(const float *ptrSigy,const float *ptrSigx, float *ptrCorr);
 void maxValue(maxStruct *ptrMax, const float *ptrData, int ArraySize);
 int  isPeak(float ptrMaxVal, float *ptrData, int ArraySize);

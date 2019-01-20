@@ -14,20 +14,27 @@
 #include "common.h"
 
 #define SAMPLE_PER_SYMBLE 255
-#define Quad              4
+#define QUAD              4
 #define SYMBOL_NUM        8
-#define SAMPLE_RATE       100000
-#define BASE_BAND_FREQ0   20000
-#define BASE_BAND_FREQ1   22000
-#define BASE_BAND_FREQ2   24000
-#define BASE_BAND_FREQ3   26000
+#define BIT_NUM          (4 * SYMBOL_NUM) // 1个码元由4位二进制组成
+#define SECTION_NUM      (2 * SYMBOL_NUM) // 1个频率代表2个二进制位
+#define BASE_BAND_FREQ0   10000
+#define BASE_BAND_FREQ1   12000
+#define BASE_BAND_FREQ2   14000
+#define BASE_BAND_FREQ3   16000
+
+typedef struct
+{
+   float deSin[2 * SAMPLE_PER_SYMBLE];
+   float deCos[2 * SAMPLE_PER_SYMBLE];
+}NCDW;
 
 #define GET_ARRAY_LEN(array,len){len = (sizeof(array) / sizeof(array[0]));}
 
 void Normalize(float *ptrData, int len);
-void genNonCoherentDemodWave(int freq, int timelen, NCDW *ptrData);
-float SquareLawDetection(float * data,const NCDW * decodesig);
-void bin2hex(const int * ptrData, char *ptrHex, int ArraySize);
+void genNonCoherentDemodWave(NCDW *ptrData, int freq, int timelen, int fs);
+float SquareLawDetection(float * data, const NCDW * decodesig, int ArraySize);
+void bin2hex(char* ptrHex, const int* ptrData, int ArraySize);
 void showData(const char* ptrData, int ArraySize);
 
 #endif
