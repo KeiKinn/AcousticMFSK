@@ -104,12 +104,12 @@ int main(void)
         {
             int fsk_sp, counter = 0;
             readADC(DataBuffer, fp, FFT_NUM);
-            fsk_sp = lfm_sp + 2 * (LFM_LENGTH + INTERVAL) - FFT_NUM;
+            fsk_sp = lfm_sp + 2 * (LFM_LENGTH + INTERVAL) - FFT_NUM; // 此时已经再次读入数据，lfm_sp的位置需要更新
 
             float fsk_data[2 * SAMPLE_PER_SYMBLE];
             float decisionvector[QUAD];
             maxStruct output;
-            int data_in_bin[2 * SYMBOL_NUM];
+            int data_in_bin[BIT_NUM];
 
             while(counter < SECTION_NUM)
             {
@@ -124,6 +124,7 @@ int main(void)
 
                 switch(output.Loc)
                 {
+                // 倒序存储数据位
                 case 0:
                     data_in_bin[2 * (SECTION_NUM - 1 - counter)]      = 0;
                     data_in_bin[2 * (SECTION_NUM - 1 - counter) + 1 ] = 0;

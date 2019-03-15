@@ -17,7 +17,7 @@
 #define QUAD              4
 #define SYMBOL_NUM        8
 #define BIT_NUM          (4 * SYMBOL_NUM) // 1个码元由4位二进制组成
-#define SECTION_NUM      (2 * SYMBOL_NUM) // 1个频率代表2个二进制位
+#define SECTION_NUM      (2 * SYMBOL_NUM) // 1个频率代表2个二进制位，存储时需要以2步进访问数组下标
 #define BASE_BAND_FREQ0   10000
 #define BASE_BAND_FREQ1   12000
 #define BASE_BAND_FREQ2   14000
