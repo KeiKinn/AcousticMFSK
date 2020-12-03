@@ -5,4 +5,4 @@
 
 This project is for an underwater MFSK acoustic communication system using LFM signals as synchronized data.
 
-The development environment for the TMS320C6748, the use of most of the libraries are ti official library, portability is very good.
+The development environment for the TMS320C6748, the use of most of the libraries are ti official library, which means the portability is very good.
